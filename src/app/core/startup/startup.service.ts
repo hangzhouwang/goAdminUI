@@ -33,7 +33,7 @@ export class StartupService {
     // only works with promises
     // https://github.com/angular/angular/issues/15088
     return new Promise((resolve) => {
-      zip(this.httpClient.get(`assets/tmp/i18n/${this.i18n.defaultLang}.json`), this.httpClient.get('assets/tmp/app-data.json'))
+      zip(this.httpClient.get(`admin/api/system/${this.i18n.defaultLang}.json`), this.httpClient.get('admin/api/system/app-data.json'))
         .pipe(
           // 接收其他拦截器后产生的异常消息
           catchError((res) => {

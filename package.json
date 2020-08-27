@@ -22,6 +22,7 @@
   ],
   "scripts": {
     "ng": "ng",
+    "dev": "ng serve --proxy-config proxy.conf.json -o",
     "start": "npm run color-less && ng serve -o",
     "hmr": "npm run color-less && ng serve -c=hmr",
     "build": "npm run color-less && node --max_old_space_size=5120 ./node_modules/@angular/cli/bin/ng build --prod",
