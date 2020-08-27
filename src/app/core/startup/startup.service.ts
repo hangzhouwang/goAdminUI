@@ -30,28 +30,34 @@ export class StartupService {
   }
 
   load(): Promise<void> {
-    // only works with promises
-    // https://github.com/angular/angular/issues/15088
+
     return new Promise((resolve) => {
-      zip(this.httpClient.get(`admin/api/system/${this.i18n.defaultLang}.json`), this.httpClient.get('admin/api/system/app-data.json'))
+      zip(this.httpClient.get(`/lang/${this.i18n.defaultLang}.json?_allow_anonymous=true`), this.httpClient.get('/system?_allow_anonymous=true'), this.httpClient.get('/system/app-data.json?_allow_anonymous=true'))
         .pipe(
           // 接收其他拦截器后产生的异常消息
           catchError((res) => {
-            console.warn(`StartupService.load: Network request failed`, res);
+            console.warn(`StartupService 启动失败: Network request failed`, res);
             resolve();
             return [];
           }),
         )
         .subscribe(
-          ([langData, appData]) => {
+          ([langData, appData, menuData]) => {
             // setting language data
             this.translate.setTranslation(this.i18n.defaultLang, langData);
             this.translate.setDefaultLang(this.i18n.defaultLang);
 
-            // application data
-            const res = appData;
+
+            //系统
+            const app = appData.data;
+
+            //菜单
+            const res = menuData;
+
+            app['name'] = app['site_name'];
+
             // 应用信息：包括站点名、描述、年份
-            this.settingService.setApp(res.app);
+            this.settingService.setApp(app);
             // 用户信息：包括姓名、头像、邮箱地址
             this.settingService.setUser(res.user);
             // ACL：设置权限为全量
@@ -59,10 +65,11 @@ export class StartupService {
             // 初始化菜单
             this.menuService.add(res.menu);
             // 设置页面标题的后缀
-            this.titleService.default = '';
-            this.titleService.suffix = res.app.name;
+            this.titleService.default = "";
+            this.titleService.suffix = app['name'];
           },
-          () => {},
+          () => {
+          },
           () => {
             resolve();
           },
